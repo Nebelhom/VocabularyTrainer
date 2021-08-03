@@ -1,5 +1,6 @@
 package com.example.vocabularytrainer
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -17,32 +18,67 @@ import kotlin.system.exitProcess
 // allow switch between language directions
 // make the arrow point in the fitting direction
 
+public final class VocabularyTrainer(private val context: Context) {
+    // import the baseline
+    val basevocabulary: List<List<String>> = readVocabCSV()
+    // working vocabulary ready to be filtered
+    var vocablist: List<List<String>> = basevocabulary.drop(1)
+    // The item displayed on the app
+    var vocab: List<String> = vocablist[0]
+    // Headings to be used to populate GUI
+    val headers: List<String> = basevocabulary[0]
+
+    fun createSet(index: Int): List<String>{
+        // takes val basevocabulary, and based on index of the nested list item creates a set
+        // of unique values
+        val valueSet = mutableSetOf<String>("All")
+
+        for (item in basevocabulary){
+            valueSet.add(item[index])
+        }
+        // `it` selects to sort ascending
+        return valueSet.sortedBy { it }
+    }
+
+    fun readVocabCSV(): List<List<String>> {
+        return csvReader{delimiter = ';'}.readAll(context.assets.open("vocab.csv"))
+    }
+
+    fun switchVocab(){
+        vocab = vocablist.random()
+    }
+}
+
+
 class MainActivity : AppCompatActivity() {
+
+    //val vc = VocabularyTrainer(applicationContext)
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // import the baseline
-        val basevocabulary: List<List<String>> = readVocabCSV()
-        // working vocabulary ready to be filtered
-        var vocablist: List<List<String>> = basevocabulary.drop(1)
-        // Headings to be used to populate GUI
-        val headers: List<String> = basevocabulary[0]
+        val vc = VocabularyTrainer(applicationContext)
 
         // Populate the GUI
         val lang1: TextView = findViewById(R.id.textViewLang1)
-        lang1.text = headers[0]
+        lang1.text = vc.headers[0]
         val lang1a: TextView = findViewById(R.id.textViewLang1a)
-        lang1a.text = headers[0]
+        lang1a.text = vc.headers[0]
 
         val lang2: TextView = findViewById(R.id.textViewLang2)
-        lang2.text = headers[1]
+        lang2.text = vc.headers[1]
         val lang2a: TextView = findViewById(R.id.textViewLang2a)
-        lang2a.text = headers[1]
+        lang2a.text = vc.headers[1]
+
+        // Set the Vocabulary containers
+        val vocab1: EditText = findViewById(R.id.Vocab1)
+        val vocab2: EditText = findViewById(R.id.Vocab2)
 
         // Create set of all wordtypes
-        var wordTypes: List<String> = create_set(vocablist, 2)
+        var wordTypes: List<String> = vc.createSet(2)
 
         // https://tutorialwing.com/android-spinner-using-kotlin-with-example/
         // Populates the Spinner and ties a function to it.
@@ -69,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Create set of all units
-        var units: List<String> = create_set(vocablist, 3)
+        var units: List<String> = vc.createSet(3)
 
         // https://tutorialwing.com/android-spinner-using-kotlin-with-example/
         // Populates the Spinner and ties a function to it.
@@ -98,25 +134,35 @@ class MainActivity : AppCompatActivity() {
         println("================")
         println("================")
         println("================")
-        println(headers)
+        println(vc.headers)
         println(wordTypes)
         println(units)
+        println(vc.vocab) // how to obtain a random item --> link function to nextbtn
+        vc.switchVocab()
+        println(vc.vocab)
         println("================")
         println("================")
         println("================")
 
+        val nextbtn: Button = findViewById(R.id.nextbtn)
+        nextbtn.setOnClickListener {
+
+            if (nextbtn.text == "Start"){
+                nextbtn.setText("Next")
+            }
+
+            if (vocab2.text.toString() != "") {
+                vocab2.setText("")
+            }
+
+            vc.switchVocab()
+            vocab1.setText(vc.vocab[0])
         }
 
-    fun create_set(base: List<List<String>>, index: Int): List<String>{
-        // takes val basevocabulary, and based on index of the nested list item creates a set
-        // of unique values
-        val valueSet = mutableSetOf<String>("All")
-
-        for (item in base){
-            valueSet.add(item[index])
+        val showbtn: Button = findViewById(R.id.showbtn)
+        showbtn.setOnClickListener {
+            vocab2.setText(vc.vocab[1])
         }
-        // `it` selects to sort ascending
-        return valueSet.sortedBy { it }
     }
 
     fun quitApp(view: View) {
@@ -124,7 +170,5 @@ class MainActivity : AppCompatActivity() {
         exitProcess(0)
     }
 
-    fun readVocabCSV(): List<List<String>> {
-        return csvReader{delimiter = ';'}.readAll(assets.open("vocab.csv"))
-    }
+
 }
