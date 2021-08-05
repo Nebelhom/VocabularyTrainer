@@ -11,10 +11,10 @@ import kotlin.system.exitProcess
 
 
 // TODO
-// Choose random vocabulary item and populate lang1 and lang2 on press start/next
-// Show the other side on question
+// Filter by unit and word type --> Works, now tie it to the spinners
+// https://stackoverflow.com/questions/46447296/android-kotlin-onitemselectedlistener-for-spinner-not-working
 
-// Filter by unit and word type
+
 // allow switch between language directions
 // make the arrow point in the fitting direction
 
@@ -33,11 +33,36 @@ public final class VocabularyTrainer(private val context: Context) {
         // of unique values
         val valueSet = mutableSetOf<String>("All")
 
-        for (item in basevocabulary){
+        for (item in basevocabulary.drop(1)){
             valueSet.add(item[index])
         }
         // `it` selects to sort ascending
         return valueSet.sortedBy { it }
+    }
+
+    fun filterVocabList(keywordtype: String, keywordlesson: String){
+        /*
+        Functions filters vocablist according to given keywords. It always filters first by type
+        then by lesson number.
+
+        "All" means all types or lessons
+
+        Index: 2 = wordtypes
+        Index: 3 = Lesson
+         */
+
+        // Filter for wordtype
+        if (keywordtype == "All"){
+            vocablist = basevocabulary.drop(1)
+        }
+        else {
+            vocablist = basevocabulary.drop(1).filter { it[2] == keywordtype }
+        }
+
+        // Filter for lesson
+        if (keywordlesson != "All") {
+            vocablist = vocablist.filter { it[3] == keywordlesson }
+        }
     }
 
     fun readVocabCSV(): List<List<String>> {
@@ -51,10 +76,6 @@ public final class VocabularyTrainer(private val context: Context) {
 
 
 class MainActivity : AppCompatActivity() {
-
-    //val vc = VocabularyTrainer(applicationContext)
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,10 +100,15 @@ class MainActivity : AppCompatActivity() {
 
         // Create set of all wordtypes
         var wordTypes: List<String> = vc.createSet(2)
+        // Create set of all units
+        var units: List<String> = vc.createSet(3)
 
         // https://tutorialwing.com/android-spinner-using-kotlin-with-example/
         // Populates the Spinner and ties a function to it.
         val spinword = findViewById<Spinner>(R.id.spinnerwordtype)
+        val spinunit = findViewById<Spinner>(R.id.spinnerunit)
+
+        // Spinner Action
         if (spinword != null) {
             val wtarrayAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, wordTypes)
             spinword.adapter = wtarrayAdapter
@@ -94,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                     position: Int,
                     id: Long
                 ) {
-                    println(wordTypes[position])
+                    vc.filterVocabList(spinword.selectedItem.toString(), spinunit.selectedItem.toString())
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -104,12 +130,9 @@ class MainActivity : AppCompatActivity() {
             spinword.setSelection(wordTypes.indexOf("All"))
         }
 
-        // Create set of all units
-        var units: List<String> = vc.createSet(3)
 
-        // https://tutorialwing.com/android-spinner-using-kotlin-with-example/
-        // Populates the Spinner and ties a function to it.
-        val spinunit = findViewById<Spinner>(R.id.spinnerunit)
+
+
         if (spinunit != null) {
             val wtarrayAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, units)
             spinunit.adapter = wtarrayAdapter
@@ -121,7 +144,7 @@ class MainActivity : AppCompatActivity() {
                     position: Int,
                     id: Long
                 ) {
-                    println(units[position])
+                    vc.filterVocabList(spinword.selectedItem.toString(), spinunit.selectedItem.toString())
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -130,19 +153,6 @@ class MainActivity : AppCompatActivity() {
             }
             spinunit.setSelection(units.indexOf("All"))
         }
-
-        println("================")
-        println("================")
-        println("================")
-        println(vc.headers)
-        println(wordTypes)
-        println(units)
-        println(vc.vocab) // how to obtain a random item --> link function to nextbtn
-        vc.switchVocab()
-        println(vc.vocab)
-        println("================")
-        println("================")
-        println("================")
 
         val nextbtn: Button = findViewById(R.id.nextbtn)
         nextbtn.setOnClickListener {
@@ -163,6 +173,7 @@ class MainActivity : AppCompatActivity() {
         showbtn.setOnClickListener {
             vocab2.setText(vc.vocab[1])
         }
+
     }
 
     fun quitApp(view: View) {
