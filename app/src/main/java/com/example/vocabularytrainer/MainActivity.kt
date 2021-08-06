@@ -11,12 +11,10 @@ import kotlin.system.exitProcess
 
 
 // TODO
-// Filter by unit and word type --> Works, now tie it to the spinners
-// https://stackoverflow.com/questions/46447296/android-kotlin-onitemselectedlistener-for-spinner-not-working
-
-
 // allow switch between language directions
 // make the arrow point in the fitting direction
+
+// Check value
 
 public final class VocabularyTrainer(private val context: Context) {
     // import the baseline
