@@ -9,11 +9,11 @@ import android.widget.*
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import kotlin.system.exitProcess
 
-public final class VocabularyTrainer(private val context: Context) {
+class VocabularyTrainer(private val context: Context) {
     // import the baseline
-    val basevocabulary: List<List<String>> = readVocabCSV()
+    private val basevocabulary: List<List<String>> = readVocabCSV()
     // working vocabulary ready to be filtered
-    var vocablist: List<List<String>> = basevocabulary.drop(1)
+    private var vocablist: List<List<String>> = basevocabulary.drop(1)
     // The item displayed on the app
     var vocab: List<String> = vocablist[0]
     // Headings to be used to populate GUI
@@ -43,10 +43,9 @@ public final class VocabularyTrainer(private val context: Context) {
          */
 
         // Filter for wordtype
-        if (keywordtype == "All"){
-            vocablist = basevocabulary.drop(1)
-        }
-        else {
+        vocablist = basevocabulary.drop(1)
+
+        if (keywordtype != "All") {
             vocablist = basevocabulary.drop(1).filter { it[2] == keywordtype }
         }
 
@@ -61,7 +60,7 @@ public final class VocabularyTrainer(private val context: Context) {
         }
     }
 
-    fun readVocabCSV(): List<List<String>> {
+    private fun readVocabCSV(): List<List<String>> {
         return csvReader{delimiter = ';'}.readAll(context.assets.open("vocab.csv"))
     }
 
@@ -99,9 +98,9 @@ class MainActivity : AppCompatActivity() {
         var reverseLang: Boolean = false
 
         // Create set of all wordtypes
-        var wordTypes: List<String> = vc.createSet(2)
+        val wordTypes: List<String> = vc.createSet(2)
         // Create set of all units
-        var units: List<String> = vc.createSet(3)
+        val units: List<String> = vc.createSet(3)
 
         // https://tutorialwing.com/android-spinner-using-kotlin-with-example/
         // Populates the Spinner and ties a function to it.
@@ -120,7 +119,10 @@ class MainActivity : AppCompatActivity() {
                     position: Int,
                     id: Long
                 ) {
-                    vc.filterVocabList(spinword.selectedItem.toString(), spinunit.selectedItem.toString())
+                    vc.filterVocabList(
+                        spinword.selectedItem.toString(),
+                        spinunit.selectedItem.toString()
+                    )
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -141,7 +143,10 @@ class MainActivity : AppCompatActivity() {
                     position: Int,
                     id: Long
                 ) {
-                    vc.filterVocabList(spinword.selectedItem.toString(), spinunit.selectedItem.toString())
+                    vc.filterVocabList(
+                        spinword.selectedItem.toString(),
+                        spinunit.selectedItem.toString()
+                    )
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>) {
@@ -154,8 +159,8 @@ class MainActivity : AppCompatActivity() {
         val nextbtn: Button = findViewById(R.id.nextbtn)
         nextbtn.setOnClickListener {
 
-            if (nextbtn.text == "Start"){
-                nextbtn.setText("Next")
+            if (nextbtn.text == "Start") {
+                nextbtn.setText(getString(R.string.nextbtn_string))
             }
 
             vc.switchVocab()
@@ -165,9 +170,7 @@ class MainActivity : AppCompatActivity() {
                     vocab1.setText("")
                 }
                 vocab2.setText(vc.vocab[1])
-            }
-
-            else {
+            } else {
                 if (vocab2.text.toString() != "") {
                     vocab2.setText("")
                 }
@@ -179,8 +182,7 @@ class MainActivity : AppCompatActivity() {
         showbtn.setOnClickListener {
             if (reverseLang) {
                 vocab1.setText(vc.vocab[0])
-            }
-            else {
+            } else {
                 vocab2.setText(vc.vocab[1])
             }
 
@@ -192,17 +194,15 @@ class MainActivity : AppCompatActivity() {
 
             if (reverseLang) {
                 lswitchbtn.setText("<-")
-            }
-            else {
+            } else {
                 lswitchbtn.setText("->")
             }
         }
 
+        val quitbtn: Button = findViewById(R.id.quitbtn)
+        quitbtn.setOnClickListener {
+            this@MainActivity.finish()
+            exitProcess(0)
+        }
     }
-
-    fun quitApp(view: View) {
-        this@MainActivity.finish()
-        exitProcess(0)
-    }
-
 }
