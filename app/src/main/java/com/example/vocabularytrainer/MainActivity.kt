@@ -14,7 +14,9 @@ import kotlin.system.exitProcess
 // allow switch between language directions
 // make the arrow point in the fitting direction
 
-// Check value
+// Check spinner values and that vocablist is not empty.
+// two options, check if empty and reset
+// or grey out options in spinner
 
 public final class VocabularyTrainer(private val context: Context) {
     // import the baseline
