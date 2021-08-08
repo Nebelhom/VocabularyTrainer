@@ -11,5 +11,4 @@
     <string name="unit_string">Unit</string>
     <string name="arrow_string">-></string>
     <string name="quit_string">Quit</string>
-    <string name="avoid_error_hint">This widget may be too small to be read</string>
     </resources>
