@@ -17,7 +17,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinnerwordtype"
-        app:layout_constraintVertical_bias="0.18" />
+        app:layout_constraintVertical_bias="0.294" />
 
     <TextView
         android:id="@+id/textViewLang2"
@@ -168,15 +168,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Unit"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button2"
-        app:layout_constraintHorizontal_bias="0.092"
+        app:layout_constraintBottom_toTopOf="@+id/spinnerunit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewLang1a"
-        app:layout_constraintVertical_bias="0.332" />
+        app:layout_constraintTop_toBottomOf="@+id/spinnerwordtype"
+        app:layout_constraintVertical_bias="0.49" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/lswitchbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="->"

@@ -98,6 +98,10 @@ class MainActivity : AppCompatActivity() {
         val vocab1: EditText = findViewById(R.id.Vocab1)
         val vocab2: EditText = findViewById(R.id.Vocab2)
 
+        // Determines "direction" of language
+        // lang1 shown, guess lang2 or vice versa
+        var reverseLang: Boolean = false
+
         // Create set of all wordtypes
         var wordTypes: List<String> = vc.createSet(2)
         // Create set of all units
@@ -130,9 +134,6 @@ class MainActivity : AppCompatActivity() {
             spinword.setSelection(wordTypes.indexOf("All"))
         }
 
-
-
-
         if (spinunit != null) {
             val wtarrayAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, units)
             spinunit.adapter = wtarrayAdapter
@@ -161,17 +162,44 @@ class MainActivity : AppCompatActivity() {
                 nextbtn.setText("Next")
             }
 
-            if (vocab2.text.toString() != "") {
-                vocab2.setText("")
+            vc.switchVocab()
+
+            if (reverseLang) {
+                if (vocab1.text.toString() != "") {
+                    vocab1.setText("")
+                }
+                vocab2.setText(vc.vocab[1])
             }
 
-            vc.switchVocab()
-            vocab1.setText(vc.vocab[0])
+            else {
+                if (vocab2.text.toString() != "") {
+                    vocab2.setText("")
+                }
+                vocab1.setText(vc.vocab[0])
+            }
         }
 
         val showbtn: Button = findViewById(R.id.showbtn)
         showbtn.setOnClickListener {
-            vocab2.setText(vc.vocab[1])
+            if (reverseLang) {
+                vocab1.setText(vc.vocab[0])
+            }
+            else {
+                vocab2.setText(vc.vocab[1])
+            }
+
+        }
+
+        val lswitchbtn: Button = findViewById(R.id.lswitchbutton)
+        lswitchbtn.setOnClickListener {
+            reverseLang = !reverseLang
+
+            if (reverseLang) {
+                lswitchbtn.setText("<-")
+            }
+            else {
+                lswitchbtn.setText("->")
+            }
         }
 
     }
@@ -180,6 +208,5 @@ class MainActivity : AppCompatActivity() {
         this@MainActivity.finish()
         exitProcess(0)
     }
-
 
 }
